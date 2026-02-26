@@ -3,17 +3,10 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                echo "Cloning repository..."
-            }
-        }
-
         stage('Build Backend Image') {
             steps {
                 echo "Building backend Docker image..."
                 sh '''
-                cd CC_LAB-6
                 docker build -t backend-app backend
                 '''
             }
@@ -21,7 +14,7 @@ pipeline {
 
         stage('Remove Old Containers') {
             steps {
-                echo "Removing old backend and nginx containers if they exist..."
+                echo "Removing old containers..."
                 sh '''
                 docker rm -f backend1 backend2 nginx-lb || true
                 '''
@@ -39,7 +32,7 @@ pipeline {
             }
         }
 
-        stage('Start NGINX Load Balancer') {
+        stage('Start NGINX') {
             steps {
                 echo "Starting nginx load balancer..."
                 sh '''
@@ -53,7 +46,7 @@ pipeline {
             steps {
                 echo "Copying nginx configuration..."
                 sh '''
-                docker cp CC_LAB-6/nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+                docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
                 docker exec nginx-lb nginx -s reload
                 '''
             }
